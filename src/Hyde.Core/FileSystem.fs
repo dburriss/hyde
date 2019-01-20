@@ -1,4 +1,4 @@
-﻿module FileSystem
+﻿module FS
 
 open System.IO
 
@@ -49,7 +49,14 @@ module FSItem =
             let dir = directory path
             match dir with
             | Some d -> d |> construct
-            | None -> failwith (sprintf "%s does not exist" path)                
+            | None -> failwith (sprintf "%s does not exist" path)
+            
+    let isEmpty fsItem =
+        match fsItem with
+        | D (_, fs) -> fs |> List.isEmpty
+        | F fi -> fi.Length = 0L 
+
+    let hasContent fsItem = fsItem |> isEmpty |> not
    
 let discover firFilter fileFilter path = 
     FSItem.init path firFilter fileFilter

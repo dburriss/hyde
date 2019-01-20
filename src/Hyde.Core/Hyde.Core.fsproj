@@ -10,8 +10,8 @@
     <Compile Include="Domain.fs" />
     <Compile Include="Liquid.fs" />
     <Compile Include="Yaml.fs" />
-    <Compile Include="FileSystem.fs" />
     <Compile Include="Template.fs" />
+    <Compile Include="FileSystem.fs" />
   </ItemGroup>
 
   <ItemGroup>
