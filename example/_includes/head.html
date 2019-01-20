@@ -1,0 +1,14 @@
+<head>
+    <!-- META -->
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ title }}</title>
+    <meta name="description" content="{{ description }}">
+    <meta name="author" content="{{ site.author }}">
+    {% if page.subtitle %}
+    <link rel="canonical" href="{{ page.url | replace:'index.html','' | prepend: site.url }}">
+    {% endif %}
+    <link rel="icon" type="image/png" href="{{ site.url }}img/favicon16.png" sizes="16x16">  
+    <link rel="icon" type="image/png" href="{{ site.url }}img/favicon32.png" sizes="32x32">
+</head>
