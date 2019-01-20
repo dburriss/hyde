@@ -12,7 +12,7 @@ let ``Split content without FrontMatter`` () =
     test <@ result.ContentText = text @>
 
 [<Fact>]
-let ``Split content without fontmatter`` () =
+let ``Split content with FrontMatter`` () =
     let text = "
     ---
     Key: a value
@@ -20,5 +20,19 @@ let ``Split content without fontmatter`` () =
     Some text"
     let result = Template.parseText text
     let expectedFM : FrontMatter = [("Key",box "a value")] |> Map.ofList
+    let expectedText = "Some text"
     test <@ result.FrontMatter = Some expectedFM @>
-    test <@ result.ContentText = text @>
+    test <@ result.ContentText = expectedText @>
+
+[<Fact>]
+let ``Split content with FrontMatter and -- in content`` () =
+    let text = "
+    ---
+    Key: a value
+    ---
+    Some --- text"
+    let result = Template.parseText text
+    let expectedFM : FrontMatter = [("Key",box "a value")] |> Map.ofList
+    let expectedText = "Some --- text"
+    test <@ result.FrontMatter = Some expectedFM @>
+    test <@ result.ContentText = expectedText @>

@@ -23,10 +23,10 @@ module Template =
         if(start = -1) then
             (None,s)
         else 
-            let fin = s |> String.indexOfLast "---" //todo: what if content contains ---
-            let fm = s.Substring(start |> shift, fin - (start |> shift))
-            let cStart = fin |> shift
-            let cEndLen = (s.Length - ((fin |> shift) - start))
+            let fmfin = s |> String.indexOf "---" (start |> shift)
+            let fm = s.Substring(start |> shift, fmfin - (start |> shift))
+            let cStart = fmfin |> shift
+            let cEndLen = (s.Length - cStart)
             let c = s.Substring(cStart, cEndLen)
             (Some (fm |> String.trim),(c |> String.trim))
 
