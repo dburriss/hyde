@@ -9,6 +9,14 @@ and DItem = DirectoryInfo * FSItem list
 and FItem = FileInfo
 
 let dirExists path = Directory.Exists(path)
+let createDir path = Directory.CreateDirectory path |> ignore
+let createDirStructure (path:string) = 
+    let paths = path.Split(Path.PathSeparator)
+    let mutable dir = ""
+    for d in paths do 
+        dir <- Path.Combine(dir, d)
+        createDir dir
+
 let fileExists path = File.Exists(path)
 let directoryName path = if(dirExists path) then Some(Path.GetDirectoryName(path)) else None
 let fileContent path = if(fileExists path) then Some(File.ReadAllText(path)) else None

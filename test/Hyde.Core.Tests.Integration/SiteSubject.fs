@@ -1,6 +1,7 @@
 ﻿module SiteSubject
 
 open System.IO
+open System
 
 let private indexContent() = 
     "
@@ -107,8 +108,14 @@ let private createSiteFiles path =
     createPages path
     createPosts path
 
-let standard path =
+let exampleSite path =
     createDir path
     createSiteDirs path
     createSiteFiles path
 
+let tempDir path =
+    Directory.CreateDirectory(path) |> ignore
+    { 
+        new IDisposable with
+            member this.Dispose() = if(Directory.Exists(path)) then Directory.Delete(path,true) else ()
+    }

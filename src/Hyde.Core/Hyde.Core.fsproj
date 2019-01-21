@@ -12,6 +12,7 @@
     <Compile Include="Yaml.fs" />
     <Compile Include="Template.fs" />
     <Compile Include="FileSystem.fs" />
+    <Compile Include="Site.fs" />
   </ItemGroup>
 
   <ItemGroup>

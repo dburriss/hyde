@@ -2,7 +2,7 @@
 
 open Xunit
 open Swensen.Unquote
-open Hyde
+open Frankenstein
 
 [<Fact>]
 let ``Split content without FrontMatter`` () =

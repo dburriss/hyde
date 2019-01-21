@@ -9,13 +9,6 @@ open System
 let allDirs (_:DirectoryInfo) = true
 let allFiles (_:FileInfo) = true
 
-let tempDir path =
-    Directory.CreateDirectory(path) |> ignore
-    { 
-        new IDisposable with
-            member this.Dispose() = if(Directory.Exists(path)) then Directory.Delete(path,true) else ()
-    }
-
 [<Fact>]
 let ``dirExists for non-existent dir`` () =
     let path = "i-do-not-exist"
@@ -24,13 +17,13 @@ let ``dirExists for non-existent dir`` () =
 [<Fact>]
 let ``dirExists for existing dir`` () =
     let path = "dir-with-no-files"
-    use dis = tempDir path
+    use dis = SiteSubject.tempDir path
     test  <@ (FS.dirExists path) = true @>
 
 [<Fact>]
 let ``Empty directory contains no files`` () =
     let path = "dir-with-no-files"
-    use dis = tempDir path
+    use dis = SiteSubject.tempDir path
     let fsItem = FS.FSItem.init path allDirs allFiles
     let dirEmpty = fsItem |> FSItem.isEmpty
     test  <@ dirEmpty = true @>
@@ -38,8 +31,8 @@ let ``Empty directory contains no files`` () =
 [<Fact>]
 let ``FS on example site is not empty`` () =
     let path = "TestSite"
-    use dis = tempDir path
-    SiteSubject.standard path
+    use dis = SiteSubject.tempDir path
+    SiteSubject.exampleSite path
     let fsItem = FS.FSItem.init path allDirs allFiles
     let hasContent = fsItem |> FSItem.hasContent
     test  <@ hasContent = true @>

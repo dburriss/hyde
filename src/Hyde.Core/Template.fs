@@ -1,4 +1,4 @@
-﻿namespace Hyde
+﻿namespace Frankenstein
 
 module Template = 
     open System

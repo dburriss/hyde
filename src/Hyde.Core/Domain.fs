@@ -1,4 +1,4 @@
-namespace Hyde
+namespace Frankenstein
 
 type FrontMatter = Map<string,obj>
 type ContentItem = {
@@ -25,7 +25,8 @@ type Include = | Include of SupportItem
 type Page = | Page of TemplateItem
 type Post = | Post of TemplateItem
 
-type SiteFileContext = {
+type SiteFiles = {
+    Site: Map<string,obj>
     Includes : Map<string,Include>
     Layouts : Map<string,Layout>
     Pages : Page list
