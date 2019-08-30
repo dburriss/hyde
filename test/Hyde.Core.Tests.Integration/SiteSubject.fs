@@ -66,6 +66,12 @@ let private includeHeadContent() =
     <meta name=\"author\" content=\"{{ site.author }}\">
 </head>"
 
+let private config() =
+    "
+title: 'My Site'
+author: 'Bob'
+"
+
 let private createDir path = Directory.CreateDirectory path |> ignore
 let private createDirs ds = ds |> List.iter createDir
 
@@ -102,6 +108,11 @@ let createIncludes path =
         (Path.Combine(path, "_includes","head.html"), includeHeadContent())
     ]
 
+let createConfig path =
+    createFiles [
+        (Path.Combine(path, "_config.yaml"), config())
+    ]
+
 let private createSiteFiles path =
     createIncludes path
     createLayouts path
@@ -112,6 +123,7 @@ let exampleSite path =
     createDir path
     createSiteDirs path
     createSiteFiles path
+    createConfig path
 
 let tempDir path =
     Directory.CreateDirectory(path) |> ignore

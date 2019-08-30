@@ -37,7 +37,7 @@ let trueIfComplex x =
     | IsComplex _ -> true
     | _ -> failwith "Did not match IsSimple or IsComplex"
 
-type TestR = {
+type TestSimple = {
     Age:int
     Name:string
 }
@@ -53,20 +53,6 @@ let ``string is simple`` () =
 [<Fact>]
 let ``DateTime is simple`` () = 
     DateTime.Now |> Reflection.isSimple |> isTrue
-
-[<Fact>]
-let ``toMap on a record contains keys of record`` () =   
-    let data = { Age = 30; Name = "Bob"}
-    let m = data |> Reflection.objToMap 
-    m |> containsKey "Age"
-    m |> containsKey "Name"
-
-[<Fact>]
-let ``toMap on a record contains values of record`` () =
-    let data = { Age = 30; Name = "Bob"}
-    let m = data |> Reflection.objToMap 
-    m |> iItemIs "Age" data.Age
-    m |> sItemIs "Name" data.Name
 
 [<Fact>]
 let ``IsSimple on simple value is matched`` () =
@@ -87,7 +73,87 @@ let ``IsComplex on simple value is not matched`` () =
     r |> isFalse
 
 [<Fact>]
+let ``IsList on an int does not match list`` () =
+    let i = 1
+    let islist x =
+        match x with
+        | IsList _ -> true
+        | _ -> false
+    let result = islist(i)
+    test <@ result = false @>
+
+[<Fact>]
+let ``IsList on an list does match list`` () =
+    let i = [1;2]
+    let islist x =
+        match x with
+        | IsList _ -> true
+        | _ -> false
+    let result = islist(i)
+    test <@ result = true @>
+
+[<Fact>]
+let ``IsList matches against other collections`` () =
+    let i = [1;2]
+    let whatType x =
+        match x with
+        | IsSeq _ -> "seq"
+        | IsArray _ -> "array"
+        | IsResizeArray _ -> "resizearray"
+        | IsList _ -> "list"        
+        | _ -> "unknown"
+    let result = whatType(i)
+    test <@ result = "list" @>
+
+[<Fact>]
+let ``IsSeq matches against other collections`` () =
+    let i = seq { 1..2 }
+    let whatType x =
+        match x with
+        | IsSeq _ -> "seq"
+        | IsArray _ -> "array"
+        | IsResizeArray _ -> "resizearray"
+        | IsList _ -> "list"        
+        | _ -> "unknown"
+    let result = whatType(i)
+    test <@ result = "seq" @>
+
+[<Fact>]
 let ``IsComplex on complex value is matched`` () =
     let data = { Age = 30; Name = "Bob"}
     let r = trueIfComplex data
     r |> isTrue
+
+[<Fact>]
+let ``toMap on a record contains keys of record`` () =   
+    let data = { Age = 30; Name = "Bob"}
+    let m = data |> Reflection.objToMap 
+    m |> containsKey "Age"
+    m |> containsKey "Name"
+
+[<Fact>]
+let ``toMap on a record contains values of record`` () =
+    let data = { Age = 30; Name = "Bob"}
+    let m = data |> Reflection.objToMap 
+    m |> iItemIs "Age" data.Age
+    m |> sItemIs "Name" data.Name
+
+[<Fact>]
+let ``toMap on a simple list returns map with index key`` () =
+    let data = ["test0";"test1"]
+    let m = data |> Reflection.objToMap 
+    let v0 = m |> Map.find "0" |> string
+    let v1 = m |> Map.find "1" |> string
+    test <@ v0 = "test0" @>
+    test <@ v1 = "test1" @>
+
+[<Fact>]
+let ``toMap on a complex list returns map with map inside`` () =
+    let e1 = { Age = 30; Name = "Bob"}
+    let e2 = { Age = 40; Name = "Dick"}
+    let data = [e1;e2]
+    let m = data |> Reflection.objToMap 
+    let v0 = m |> Map.find "0" :?> Map<string,obj> |> Map.find "Name" |> string
+    let v1 = m |> Map.find "1" :?> Map<string,obj> |> Map.find "Age" |> string |> int
+    test <@ v0 = "Bob" @>
+    test <@ v1 = 40 @>

@@ -39,10 +39,10 @@ module FSItem =
         |> Seq.filter filter
         |> List.ofSeq
 
-    let private subDirs (f:string->(DirectoryInfo->bool)->(FileInfo->bool)->FSItem) (dirFilter:DirectoryInfo->bool) (fileFilter:FileInfo->bool) (d:DirectoryInfo)  = 
+    let private subDirs (f:(DirectoryInfo->bool)->(FileInfo->bool)->string->FSItem) (dirFilter:DirectoryInfo->bool) (fileFilter:FileInfo->bool) (d:DirectoryInfo)  = 
         let ds = d |> dirs dirFilter 
-        ds |> List.map (fun sd -> (f (sd.ToString()) dirFilter fileFilter))
-    let rec init path dirFilter fileFilter = 
+        ds |> List.map (fun sd -> (f dirFilter fileFilter (sd.ToString()) ))
+    let rec init dirFilter fileFilter path = 
         let construct (di:DirectoryInfo) =
             let sDirs = di |> subDirs init dirFilter fileFilter
             let files = di |> files fileFilter |> List.map (fun f -> f |> FSItem.F)
@@ -50,10 +50,8 @@ module FSItem =
             DItem (di, items) |> FSItem.D
 
         if(fileExists path) then 
-            printfn "FILE: %s" path
             (new FileInfo(path)) |> FSItem.F
         else 
-            printfn "DIR: %s" path
             let dir = directory path
             match dir with
             | Some d -> d |> construct
@@ -65,24 +63,67 @@ module FSItem =
         | F fi -> fi.Length = 0L 
 
     let hasContent fsItem = fsItem |> isEmpty |> not
-   
-let discover firFilter fileFilter path = 
-    FSItem.init path firFilter fileFilter
-let isDirectory fi =    match fi with
-                        | FSItem.D _ -> true
-                        | FSItem.F _ -> false
 
-let isFile fi =    match fi with
-                        | FSItem.D _ -> false
-                        | FSItem.F _ -> true                            
+    let path fsitem =
+        match fsitem with
+        | D (di,_) -> di |> string
+        | F fi -> fi |> string
+
+    let name fsitem =
+        match fsitem with
+        | D (di,_) -> di.Name
+        | F fi -> fi.Name
+
+    let startsWith value fsitem = fsitem |> (name >> String.startsWith value) 
+
+    let collect mapping fsitems = fsitems |> List.collect mapping
+
+    let rec private collectMatches predicate matched fsitem =
+        let r = if(predicate fsitem) then matched @ [fsitem] else matched
+        match fsitem with
+        | D (_,fs) -> r @ (fs |> List.collect (fun i -> collectMatches predicate r i) )
+        | _ -> r
+
+
+    let matches predicate fsitem = collectMatches predicate [] fsitem
+    let contains predicate fsitem = (matches predicate fsitem) |> List.isEmpty
+
+    let isDirectory fi =    match fi with
+                            | FSItem.D _ -> true
+                            | FSItem.F _ -> false
+
+    let isFile fi =    match fi with
+                            | FSItem.D _ -> false
+                            | FSItem.F _ -> true        
+                            
+let discover firFilter fileFilter path = 
+    FSItem.init firFilter fileFilter path
+
 
 module Defaults =
-    let directoryFilter (d:DirectoryInfo) = 
-        d.Name.StartsWith("_") |> not
-        && d.Name.StartsWith(".") |> not
-        && not (["packages";"paket-files";"bin"] |> List.contains (d.Name.ToLower()))
 
-    let fileFilter (d:FileInfo) = 
-        d.Name.StartsWith("_") |> not
-        && not (["build.fsx";"hyde.fsx"] |> List.exists (fun f -> f = d.Name.ToLower()))   
-        && not (d.Name.ToLower().StartsWith("paket"))
+    
+    let private doesNotStartWithUnderscore (name:string) : bool = (name.StartsWith("_") |> not)
+    let private doesNotStartWithPeriod (name:string) : bool = (name.StartsWith(".") |> not)
+    let private including includes name = List.contains name includes
+    let private excluding excludes name = (including excludes name) |> not
+
+    let directoryFilter includes excludes (d:DirectoryInfo) = 
+        true
+        //including includes d.Name
+        //|| 
+        //(
+        //    (d.Name |> doesNotStartWithPeriod)
+        //    && (d.Name |> doesNotStartWithUnderscore)
+        //    && (d.Name |> excluding excludes)
+        //)
+
+    let fileFilter includes excludes (d:FileInfo) = 
+        true
+        //including includes d.Name
+        //|| 
+        //(
+        //    (d.Name |> doesNotStartWithPeriod)
+        //    && (d.Name |> doesNotStartWithUnderscore)
+        //    && (d.Name |> excluding excludes)
+        //)

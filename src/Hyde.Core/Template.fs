@@ -1,5 +1,10 @@
 ﻿namespace Frankenstein
 
+type RawTemplate = {
+    FrontMatter : FrontMatter option
+    RawContent : string
+}
+
 module Template = 
     open System
     
@@ -34,7 +39,7 @@ module Template =
         let (fm,content) = s |> splitContent
         {
             FrontMatter = fm |> Option.map Yaml.toMap
-            ContentText = content
+            RawContent = content
         }     
 
     let render c = ""

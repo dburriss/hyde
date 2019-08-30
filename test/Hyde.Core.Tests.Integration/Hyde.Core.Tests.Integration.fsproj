@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.1</TargetFramework>
@@ -8,6 +8,7 @@
 
   <ItemGroup>
     <Compile Include="SiteSubject.fs" />
+    <Compile Include="DiscoveryTests.fs" />
     <Compile Include="SiteTests.fs" />
     <Compile Include="FSTests.fs" />
   </ItemGroup>

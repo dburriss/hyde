@@ -9,7 +9,7 @@ let ``Split content without FrontMatter`` () =
     let text = "Some text"
     let result = Template.parseText text
     test <@ result.FrontMatter = None @>
-    test <@ result.ContentText = text @>
+    test <@ result.RawContent = text @>
 
 [<Fact>]
 let ``Split content with FrontMatter`` () =
@@ -22,7 +22,7 @@ let ``Split content with FrontMatter`` () =
     let expectedFM : FrontMatter = [("Key",box "a value")] |> Map.ofList
     let expectedText = "Some text"
     test <@ result.FrontMatter = Some expectedFM @>
-    test <@ result.ContentText = expectedText @>
+    test <@ result.RawContent = expectedText @>
 
 [<Fact>]
 let ``Split content with FrontMatter and -- in content`` () =
@@ -35,4 +35,4 @@ let ``Split content with FrontMatter and -- in content`` () =
     let expectedFM : FrontMatter = [("Key",box "a value")] |> Map.ofList
     let expectedText = "Some --- text"
     test <@ result.FrontMatter = Some expectedFM @>
-    test <@ result.ContentText = expectedText @>
+    test <@ result.RawContent = expectedText @>
